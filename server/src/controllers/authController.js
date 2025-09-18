@@ -62,6 +62,7 @@ export const logout = async (req, res) => {
     res.status(200).json({ message: "Logout successfull" });
   });
 };
+
 export const setup2FA = async (req, res) => {
   try {
     console.log("The req.user is: ", req.user);
@@ -91,6 +92,7 @@ export const setup2FA = async (req, res) => {
       .json({ error: "Error setting up 2FA", message: error.message });
   }
 };
+
 export const verify2FA = async (req, res) => {
   const { token } = req.body;
   const user = req.user;

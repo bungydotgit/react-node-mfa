@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { register, loginUser } from "../service/authApi";
 
-export default function LoginForm() {
+export default function LoginForm({ onLoginSuccess }) {
   const [isRegister, setIsRegister] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -9,9 +10,49 @@ export default function LoginForm() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
-  const handleLogin = () => { };
+  const handleRegisterToggle = () => {
+    setIsRegister(!isRegister);
+    setError("");
+    setMessage("");
+    setConfirmPassword("");
+  };
 
-  const handleRegister = () => { };
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    try {
+      const { data } = await loginUser(username, password);
+      setIsRegister(false);
+      setError("");
+      setMessage(data.message);
+      setUsername("");
+      setPassword("");
+      onLoginSuccess(data);
+    } catch (error) {
+      console.log("The err is: ", error);
+      setUsername("");
+      setPassword("");
+      setError("Invalid Login credentials");
+    }
+  };
+
+  const handleRegister = async (event) => {
+    event.preventDefault();
+    try {
+      const { data } = await register(username, password);
+      setIsRegister(false);
+      setMessage(data.message);
+      setError("");
+      setUsername("");
+      setPassword("");
+      setConfirmPassword("");
+    } catch (error) {
+      console.log("The err is: ", error);
+      setUsername("");
+      setPassword("");
+      setConfirmPassword("");
+      setError("Something went wrong in user registration");
+    }
+  };
 
   return (
     <form
@@ -37,7 +78,7 @@ export default function LoginForm() {
           <input
             type="text"
             label="Username"
-            value=""
+            value={username}
             onChange={(e) => setUsername(e.target.value)}
             className="w-full p-2 border border-gray-400 rounded mt-2"
             placeholder="Enter your username"
@@ -51,7 +92,7 @@ export default function LoginForm() {
           <input
             type="password"
             label="Password"
-            value=""
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-2 border border-gray-400 rounded mt-2"
             placeholder="Enter your password"
@@ -66,7 +107,7 @@ export default function LoginForm() {
             <input
               type="password"
               label="Password"
-              value=""
+              value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full p-2 border border-gray-400 rounded mt-2"
               placeholder="Enter your password again"
@@ -74,6 +115,8 @@ export default function LoginForm() {
             />
           </div>
         ) : null}
+        {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
+        {message && <p className="text-green-600 text-sm mb-3">{message}</p>}
         <button
           type="submit"
           className="w-full bg-blue-500 text-white py-2 rounded-md"
@@ -86,10 +129,10 @@ export default function LoginForm() {
             <Link
               className="text-blue-500 underline underline-offset-3"
               to=""
-              onClick={() => setIsRegister(!isRegister)}
+              onClick={handleRegisterToggle}
             >
               {" "}
-              {isRegister ? "Create Account" : "Login"}
+              {isRegister ? "Login" : "Create Account"}
             </Link>
           </p>
         </div>
