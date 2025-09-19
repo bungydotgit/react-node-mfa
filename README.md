@@ -1,66 +1,61 @@
 # 🔐 React + Node.js Multi-Factor Authentication (MFA) System
-
-> **Secure. Scalable. Modern.**  
-> A full-stack MFA implementation using React, Node.js, Express, and TOTP (Time-Based One-Time Password) with QR code provisioning — perfect for enterprise-grade authentication flows.
-
 ---
 
 ## 🌟 Overview
 
-This project demonstrates a production-ready **Multi-Factor Authentication (MFA)** system built with:
+This project implements a **working TOTP-based MFA flow** (like Google Authenticator) with:
 
-- **Frontend**: React (TypeScript, Vite, Tailwind CSS)
-- **Backend**: Node.js + Express (REST API)
-- **Auth Protocol**: TOTP (RFC 6238) via `speakeasy` and `qrcode`
-- **Storage**: In-memory (easily swappable for Redis/PostgreSQL)
-- **Security**: Rate limiting, input sanitization, JWT session tokens
+- ✅ **Frontend**: React (Vite), TypeScript, Tailwind CSS
+- ✅ **Backend**: Node.js + Express
+- ✅ **TOTP**: `speakeasy` for secret generation + token verification
+- ✅ **QR Code**: `qrcode` for provisioning URI → QR image
+- ✅ **Storage**: In-memory user store (simulated DB)
+- ✅ **Auth Flow**: Register → Scan QR → Login with 6-digit code
+- ✅ **Session**: Simple JWT token on successful MFA login
 
-Ideal for recruiters evaluating your **full-stack security implementation skills**, this repo showcases clean architecture, testing, documentation, and modern tooling.
-
----
-
-## 🚀 Features
-
-✅ User registration with TOTP setup via QR code  
-✅ Secure login requiring TOTP code  
-✅ Session management with JWT  
-✅ Rate limiting to prevent brute force  
-✅ Responsive UI with loading states & error handling  
-✅ TypeScript end-to-end  
-✅ Environment configuration (`.env`)  
-✅ Docker-ready (optional)  
-✅ CI/CD ready (GitHub Actions template included)
+> 💡 Ideal for demonstrating:  
+> - Full-stack integration  
+> - Security protocol implementation (TOTP)  
+> - Modern React patterns + TypeScript  
+> - Clean separation of concerns  
+> - API design + state management
 
 ---
 
-## 📊 Architecture Diagram
+## 📊 System Flow (Mermaid)
 
 ```mermaid
-graph TD
-    A[React Frontend] -->|HTTP Requests| B[Node.js/Express API]
-    B --> C[User Service]
-    C --> D[(In-Memory Store)]
-    B --> E[TOTP Service]
-    E --> F[Speakeasy Library]
-    F --> G[Generate Secret & QR]
-    E --> H[Verify TOTP Token]
-    B --> I[JWT Service]
-    I --> J[Issue/Validate Tokens]
-    A -->|Display| K[QR Code via qrcode.react]
-    A -->|Input| L[6-Digit TOTP Code]
+sequenceDiagram
+    participant User
+    participant Frontend as React Frontend
+    participant Backend as Express API
+    participant TOTP as Speakeasy
+
+    User->>Frontend: Enters email/password to register
+    Frontend->>Backend: POST /api/auth/register
+    Backend->>TOTP: Generate TOTP secret + QR URI
+    Backend-->>Frontend: { user, qrCodeUrl, tempSecret }
+    Frontend->>User: Display QR code
+    User->>Authenticator App: Scan QR (e.g., Google Auth)
+    User->>Frontend: Enter 6-digit TOTP code + credentials
+    Frontend->>Backend: POST /api/auth/login
+    Backend->>TOTP: Verify TOTP token against stored secret
+    TOTP-->>Backend: true/false
+    Backend-->>Frontend: JWT token (if valid)
+    Frontend->>User: Login success → Dashboard
 ```
 
 ---
 
-## 🧩 Tech Stack
+## 🧩 Tech Stack (Implemented Only)
 
 | Layer        | Technology             |
 |--------------|------------------------|
-| Frontend     | React + TypeScript, Vite, Tailwind CSS, `qrcode.react` |
-| Backend      | Node.js, Express, `speakeasy`, `jsonwebtoken`, `bcrypt` |
-| DevOps       | Nodemon, Concurrently, ESLint, Prettier |
-| Testing      | Jest, React Testing Library (optional setup) |
-| Deployment   | Docker, Render / Railway / Heroku ready |
+| **Frontend** | React + TypeScript, Vite, Tailwind CSS, `qrcode.react` |
+| **Backend**  | Node.js, Express, `speakeasy`, `jsonwebtoken`, `bcryptjs` |
+| **State**    | In-memory `users` array (no DB) |
+| **Tools**    | `concurrently`, `nodemon`, `cors`, `dotenv` |
+| **No extras**| No Docker, Redis, PostgreSQL, Kubernetes, CI/CD, or testing frameworks |
 
 ---
 
@@ -68,106 +63,131 @@ graph TD
 
 ### Prerequisites
 
-- Node.js ≥ v18
-- npm or yarn
-- Git
+- Node.js ≥ v16
+- npm
 
 ### Clone & Install
 
 ```bash
 git clone https://github.com/bungydotgit/react-node-mfa.git
 cd react-node-mfa
-
-# Install backend dependencies
-cd server && npm install
-
-# Install frontend dependencies
-cd ../client && npm install
 ```
 
-### Environment Variables
+### Install Dependencies
 
-Create `.env` in `/server`:
+```bash
+# Install server
+cd server
+npm install
+
+# Install client
+cd ../client
+npm install
+```
+
+### Set Environment Variables
+
+In `/server`, create `.env`:
 
 ```env
 PORT=5000
-JWT_SECRET=your_jwt_secret_here_32_chars_min
-RATE_LIMIT_MAX=5
-RATE_LIMIT_WINDOW_MS=15*60*1000
+JWT_SECRET=your_32_char_or_longer_secret_here
 ```
 
-### Run Development Server
+> ⚠️ Keep `JWT_SECRET` safe — used to sign session tokens.
 
-From root directory:
+### Run the App
+
+From the **root** directory:
 
 ```bash
 npm run dev
 ```
 
-> Uses `concurrently` to run both client and server with hot-reload.
+> Uses `concurrently` to run both client (port 5173) and server (port 5000).
 
-- Frontend: `http://localhost:5173`
-- Backend: `http://localhost:5000`
-
----
-
-## 🧪 Testing the Flow
-
-1. **Register a User**
-   - POST `/api/auth/register`
-   - Returns: `{ user, qrCodeUrl, secret }`
-
-2. **Scan QR Code**
-   - Use Google Authenticator / Authy
-   - Save generated secret securely
-
-3. **Login with TOTP**
-   - POST `/api/auth/login`
-   - Body: `{ email, password, token }`
-   - Returns JWT on success
-
-4. **Access Protected Routes**
-   - Include `Authorization: Bearer <token>` header
+✅ Open [http://localhost:5173](http://localhost:5173) to begin.
 
 ---
 
-## 🧱 Project Structure
+## 🔄 How It Works
+
+### 1. Registration
+
+- User enters email + password.
+- Server:
+  - Hashes password with `bcryptjs`
+  - Generates TOTP secret via `speakeasy.generateSecret()`
+  - Stores user + secret temporarily in memory
+  - Returns `otpauth://` URI → converted to QR code on frontend
+- Frontend displays QR code for user to scan.
+
+### 2. Login
+
+- User enters email, password, and current 6-digit TOTP code.
+- Server:
+  - Finds user
+  - Verifies password
+  - Validates TOTP token against stored secret
+  - If valid → issues JWT
+- Frontend stores JWT and redirects to protected view.
+
+### 3. “Protected” Dashboard
+
+- Simple page showing “You’re logged in!” — no actual protected API calls yet.
+- JWT is stored in memory (not persisted — refresh loses login).
+
+---
+
+## 🧱 Project Structure (Relevant Only)
 
 ```
 react-node-mfa/
 ├── client/
 │   ├── src/
-│   │   ├── components/     # Reusable UI (QR, Form, Button)
-│   │   ├── hooks/          # Custom hooks (useAuth, useLocalStorage)
-│   │   ├── pages/          # AuthPage, DashboardPage
-│   │   ├── services/       # API calls (authService.ts)
+│   │   ├── components/
+│   │   │   ├── AuthForm.tsx       # Handles register/login UI
+│   │   │   └── QRCodeDisplay.tsx  # Renders QR using qrcode.react
+│   │   ├── pages/
+│   │   │   ├── AuthPage.tsx       # Main auth view
+│   │   │   └── Dashboard.tsx      # Post-login (simple)
+│   │   ├── services/
+│   │   │   └── authService.ts     # API calls to /api/auth/*
 │   │   └── App.tsx
-├── server/
-│   ├── src/
-│   │   ├── controllers/    # Auth logic
-│   │   ├── middleware/     # Auth, rate limiting
-│   │   ├── routes/         # Express routers
-│   │   ├── services/       # TOTP, JWT, User
-│   │   └── utils/          # Helpers, types
-│   └── .env
-├── docker-compose.yml      # Optional Docker setup
-└── README.md
+│   └── ...
+└── server/
+    ├── src/
+    │   ├── controllers/
+    │   │   └── authController.ts  # Handles register/login logic
+    │   ├── routes/
+    │   │   └── authRoutes.ts      # Mounts POST /register, /login
+    │   ├── utils/
+    │   │   └── generateQR.ts      # Generates otpauth:// URI + QR data URL
+    │   └── server.ts              # Express app + middleware (CORS, JSON)
+    └── .env
 ```
 
 ---
 
-## 🔒 Security Best Practices Implemented
+## 🔒 Security Notes (Implemented)
 
-- ✅ **TOTP Secrets** never exposed to client post-setup
-- ✅ **Rate limiting** on auth endpoints
-- ✅ **Input validation & sanitization**
-- ✅ **JWT expiration** (15min access, 7d refresh)
-- ✅ **HTTPS-ready** (add SSL in prod)
-- ✅ **CORS** configured for frontend origin only
-- ✅ **Secrets** managed via `.env`
+- ✅ Passwords hashed with `bcryptjs`
+- ✅ TOTP secret generated server-side, never stored permanently
+- ✅ JWT signed with secret (expires in 1h — hardcoded)
+- ✅ CORS restricted to `localhost:5173`
+- ⚠️ **No rate limiting** (not implemented)
+- ⚠️ **No input validation/sanitization** beyond basic existence checks
+- ⚠️ **Secrets stored in memory** — restart = data loss
 
+
+## 📈 Possible Next Steps (Great Interview Talking Points!)
+
+- ➕ Add input validation (Zod / Joi)
+- ➕ Add rate limiting (express-rate-limit)
+- ➕ Persist users + secrets (SQLite / PostgreSQL)
+- ➕ Add token refresh flow
+- ➕ Add logout / token invalidation
+- ➕ Write unit tests for auth logic
+- ➕ Add recovery codes
 
 ---
-
-> ⭐ **Star this repo if you found it useful!**  
-> It helps others discover solid full-stack security examples.
