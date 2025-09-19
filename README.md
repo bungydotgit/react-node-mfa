@@ -21,7 +21,7 @@ This project implements a **working TOTP-based MFA flow** (like Google Authentic
 
 ---
 
-## 📊 System Flow (Mermaid)
+## 📊 System Flow
 
 ```mermaid
 sequenceDiagram
@@ -46,7 +46,7 @@ sequenceDiagram
 
 ---
 
-## 🧩 Tech Stack (Implemented Only)
+## 🧩 Tech Stack
 
 | Layer        | Technology             |
 |--------------|------------------------|
@@ -54,7 +54,6 @@ sequenceDiagram
 | **Backend**  | Node.js, Express, `speakeasy`, `jsonwebtoken`, `bcryptjs` |
 | **State**    | In-memory `users` array (no DB) |
 | **Tools**    | `concurrently`, `nodemon`, `cors`, `dotenv` |
-| **No extras**| No Docker, Redis, PostgreSQL, Kubernetes, CI/CD, or testing frameworks |
 
 ---
 
@@ -168,7 +167,7 @@ react-node-mfa/
 
 ---
 
-## 🔒 Security Notes (Implemented)
+## 🔒 Security Notes
 
 - ✅ Passwords hashed with `bcryptjs`
 - ✅ TOTP secret generated server-side, never stored permanently
@@ -179,9 +178,9 @@ react-node-mfa/
 - ⚠️ **Secrets stored in memory** — restart = data loss
 
 
-## 📈 Possible Next Steps (Great Interview Talking Points!)
+## 📈 Possible Next Steps
 
-- ➕ Add input validation (Zod / Joi)
+- ➕ Add input validation (Zod)
 - ➕ Add rate limiting (express-rate-limit)
 - ➕ Persist users + secrets (SQLite / PostgreSQL)
 - ➕ Add token refresh flow
