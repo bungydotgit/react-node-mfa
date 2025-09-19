@@ -5,7 +5,7 @@
 
 This project implements a **working TOTP-based MFA flow** (like Google Authenticator) with:
 
-- ✅ **Frontend**: React (Vite), TypeScript, Tailwind CSS
+- ✅ **Frontend**: React (Vite), Tailwind CSS
 - ✅ **Backend**: Node.js + Express
 - ✅ **TOTP**: `speakeasy` for secret generation + token verification
 - ✅ **QR Code**: `qrcode` for provisioning URI → QR image
@@ -16,7 +16,6 @@ This project implements a **working TOTP-based MFA flow** (like Google Authentic
 > 💡 Ideal for demonstrating:  
 > - Full-stack integration  
 > - Security protocol implementation (TOTP)  
-> - Modern React patterns + TypeScript  
 > - Clean separation of concerns  
 > - API design + state management
 
@@ -51,7 +50,7 @@ sequenceDiagram
 
 | Layer        | Technology             |
 |--------------|------------------------|
-| **Frontend** | React + TypeScript, Vite, Tailwind CSS, `qrcode.react` |
+| **Frontend** | React, Vite, Tailwind CSS, `qrcode.react` |
 | **Backend**  | Node.js, Express, `speakeasy`, `jsonwebtoken`, `bcryptjs` |
 | **State**    | In-memory `users` array (no DB) |
 | **Tools**    | `concurrently`, `nodemon`, `cors`, `dotenv` |
